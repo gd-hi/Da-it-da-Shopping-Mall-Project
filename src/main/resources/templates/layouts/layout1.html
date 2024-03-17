@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Title</title>
+    <!-- CSS only-->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.7.2/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+    <!-- [외부 css 스타일 지정] -->
+    <link th:href="@{/css/styles.css}" rel="stylesheet">
+    <link th:href="@{assets/favicon.png}" rel="shortcut icon" type="image/x-icon">
+    <link th:href="@{/css/main/chat.css}" rel="stylesheet">
+
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+
+    <!-- [외부 js 파일 경로 지정] -->
+    <script src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script type="text/javascript" th:src="@{/js/main/chat.js}"></script>
+    <script type="text/javascript" th:src="@{/js/style.js}"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+    <script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+    <script type="text/javascript" src="https://cdn.iamport.kr/js/iamport.payment-1.2.0.js"></script>
+
+
+    <script
+            src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous">
+    </script>
+
+    <!-- Black Han Sans google font -->
+    <link rel="preconnect" th:href="@{https://fonts.googleapis.com}">
+    <link rel="preconnect" th:href="@{https://fonts.gstatic.com}" crossorigin>
+    <link th:href="@{https://fonts.googleapis.com/css2?family=Black+Han+Sans&display=swap}" rel="stylesheet">
+
+    <!-- sock js -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.5.2/sockjs.min.js"></script>
+    <!-- STOMP -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+
+
+
+
+
+    <th:block layout:fragment="script"></th:block>
+    <th:block layout:fragment="css"></th:block>
+</head>
+
+
+<body>
+
+<div th:replace="~{fragments/header::header}"></div>
+<div layout:fragment="content" class="content"></div>
+
+<aside class="sidebar-cart" sec:authorize="isAuthenticated()">
+    <ul>
+        <li>
+            <a href="/cart" >
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                     class="bi bi-basket3-fill" viewBox="0 0 16 16">
+                    <path d="M5.757 1.071a.5.5 0 0 1 .172.686L3.383 6h9.234L10.07 1.757a.5.5 0 1 1 .858-.514L13.783 6H15.5a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5H.5a.5.5 0 0 1-.5-.5v-1A.5.5 0 0 1 .5 6h1.717L5.07 1.243a.5.5 0 0 1 .686-.172zM2.468 15.426.943 9h14.114l-1.525 6.426a.75.75 0 0 1-.729.574H3.197a.75.75 0 0 1-.73-.574z"/>
+                </svg>
+                <span style="font-weight: bold; font-size:25px; margin-left:6px;">장바구니</span>
+            </a>
+        </li>
+    </ul>
+</aside>
+<aside class="sidebar-home" >
+    <ul>
+        <li>
+            <a href="/">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                     class="bi bi-house-fill"
+                     viewBox="0 0 16 16">
+                    <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293z"/>
+                    <path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293z"/>
+                </svg>
+                <span style="font-weight: bold; font-size:28px; margin-left:40px;">홈</span>
+            </a>
+        </li>
+    </ul>
+</aside>
+<aside class="sidebar-map">
+    <ul>
+        <li>
+            <a href="/map">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                     class="bi bi-map-fill" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                          d="M16 .5a.5.5 0 0 0-.598-.49L10.5.99 5.598.01a.5.5 0 0 0-.196 0l-5 1A.5.5 0 0 0 0 1.5v14a.5.5 0 0 0 .598.49l4.902-.98 4.902.98a.5.5 0 0 0 .196 0l5-1A.5.5 0 0 0 16 14.5zM5 14.09V1.11l.5-.1.5.1v12.98l-.402-.08a.5.5 0 0 0-.196 0zm5 .8V1.91l.402.08a.5.5 0 0 0 .196 0L11 1.91v12.98l-.5.1z"/>
+                </svg>
+                <span style="font-weight: bold; font-size:25px; margin-left:6px;">오시는 길</span>
+            </a>
+        </li>
+    </ul>
+</aside>
+<aside class="sidebar-cs">
+    <ul>
+        <li>
+            <a href="/notice/notice">
+                <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor"
+                     class="bi bi-telephone-outbound-fill" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd"
+                          d="M1.885.511a1.745 1.745 0 0 1 2.61.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877zM11 .5a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V1.707l-4.146 4.147a.5.5 0 0 1-.708-.708L14.293 1H11.5a.5.5 0 0 1-.5-.5"/>
+                </svg>
+                <span style="font-weight: bold; font-size:25px; margin-left:6px;">공지사항</span>
+            </a>
+        </li>
+    </ul>
+</aside>
+
+
+<div id="chat-icon" sec:authorize="isAuthenticated()" style="position: fixed; bottom: 90px; right: 30px; cursor: pointer; z-index: 1000;">
+    <img src="/img/chat-icon.png" alt="채팅 아이콘" style="width: 60px; height: 60px;">
+</div>
+
+<div id="chat-box" style="display: none; position: fixed; bottom: 100px; right: 60px; width: 460px; height: 780px; border: 3px solid #8A2BE2; background-color: white; border-radius: 20px; overflow: auto; padding: 10px; box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); z-index: 1000;">
+    <main>
+        <h1>실시간 문의</h1>
+        <button class="new_chat" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">채팅생성</button>
+        <!--                <nav>-->
+        <!--                    <span>방 제목</span>-->
+        <!--                    <span>인원</span>-->
+        <!--                </nav>-->
+        <!-- 채팅방 목록 샘플 데이터 -->
+        <ul>
+            <li>
+                <!--                        <span class="chat_title">PortOne(포트원)</span>-->
+                <!--                        <span class="chat_count">17명</span>-->
+            </li>
+            <!-- 추가적인 목록 아이템이 이곳에 위치하게 됩니다 -->
+        </ul>
+    </main>
+    <!-- 채팅방 목록 -->
+
+    <!-- 채팅방 입장 -->
+    <div class="chat">
+        <div>
+            <div class="chat_body">
+                <h2 class="chat_title">방 제목</h2>
+                <button class="chat_back"><</button>
+
+                <ul class="chat_list">
+                    <li>
+                        <!-- <div class="notification">
+                            <span></span>
+                        </div> -->
+                    </li>
+                </ul>
+
+                <div class="chat_input">
+                    <div class="chat_input_area">
+                        <textarea></textarea>
+                    </div>
+
+                    <div class="chat_button_area">
+                        <button>전송</button>
+                    </div>
+                </div>
+            </div>
+
+            <!--                    <div class="chat_users">-->
+            <!--                        <h2>-->
+            <!--                            참가인원-->
+            <!--                            <span class="user"></span>-->
+            <!--                        </h2>-->
+
+            <!--                        <div class="chat_nickname">-->
+            <!--                            <ul>-->
+            <!--                                <li>-->
+            <!--                                </li>-->
+            <!--                            </ul>-->
+            <!--                        </div>-->
+            <!--                    </div>-->
+        </div>
+    </div>
+    <!-- 채팅방 입장 -->
+</div>
+
+<div th:replace="~{fragments/footer::footer}"></div>
+
+</body>
+</html>

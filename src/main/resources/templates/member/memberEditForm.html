@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+<head>
+    <title>회원 정보 수정</title>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <script type="text/javascript" th:src="@{/js/member/memberForm.js}"></script>
+    <link th:href="@{/css/member/memberForm.css}" rel="stylesheet">
+    <!-- 사용자 JS 추가-->
+    <script>
+            $(document).ready(function(){
+                var errorMessage = "[[${errorMessage}]]";
+                if (errorMessage !== "null" && errorMessage.length > 0) {
+                    Swal.fire({
+                        title: errorMessage,
+                        icon: 'warning',
+                    });
+                }
+
+                // 비밀번호 일치 여부를 실시간으로 확인하는 함수
+                $('.password2').on('input', function () {
+                    var password = $('.password1').val();
+                    var confirmPassword = $(this).val();
+
+                    if (password !== confirmPassword) {
+                        $('.pwcheck').text('비밀번호가 일치하지 않습니다.');
+                    } else {
+                        $('.pwcheck').text(''); // 일치하면 오류 메시지를 지움
+                    }
+                });
+
+                // 폼 제출 시 처리
+                $('form').submit(function (event) {
+                    var password = $('.password1').val();
+                    var confirmPassword = $('.password2').val();
+                    var newPasswordNotEmpty = password.trim().length > 0;
+
+                    // 새 비밀번호가 입력되었고, 일치하지 않으면 폼 제출을 취소
+                    if (newPasswordNotEmpty && password !== confirmPassword) {
+                        event.preventDefault(); // 폼 제출 취소
+                        $('.pwcheck').text('새 비밀번호가 일치하지 않습니다.');
+                    }
+                });
+
+            });
+        </script>
+</head>
+
+<div layout:fragment="content">
+    <header class="bg-dark py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="text-center text-white">
+                <h1 class="display-4 fw-bolder">회원 정보 수정</h1>
+                <p class="lead fw-normal text-white-50 mb-0">개인 정보를 안전하게 업데이트하세요.</p>
+            </div>
+        </div>
+    </header>
+
+    <section class="py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <form action="/members/update" method="post" th:object="${memberUpdateDto}">
+                <div class="form-group">
+                    <label for="currentPassword">현재 비밀번호</label>
+                    <input type="password" id="currentPassword" th:field="*{currentPassword}" class="form-control" placeholder="현재 비밀번호를 입력해주세요">
+                    <p th:if="${#fields.hasErrors('currentPassword')}" th:errors="*{currentPassword}" class="fieldError">현재 비밀번호가 맞지 않습니다</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword">새 비밀번호 (변경을 원하지 않으면 비워두세요)</label>
+                    <input type="password" id="newPassword" th:field="*{newPassword}" class="form-control password1" placeholder="새 비밀번호">
+                    <p th:if="${#fields.hasErrors('newPassword')}" th:errors="*{newPassword}" class="fieldError">새 비밀번호는 8자 이상, 16자 이하로 입력해주세요.</p>
+
+                </div>
+
+                <div class="form-group">
+                    <label for="newPassword">새 비밀번호 확인</label>
+                    <input type="password" id="password2" class="form-control password2" placeholder="새 비밀번호확인">
+                    <p class="pwcheck" style="color: red;"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="name">이름</label>
+                    <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="새 이름">
+                    <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="fieldError">Incorrect date</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">주소</label>
+                    <input type="text" id="address" th:field="*{address}" class="form-control" placeholder="새 주소">
+                    <p th:if="${#fields.hasErrors('address')}" th:errors="*{address}" class="fieldError">잘못된 주소 형식입니다.</p>
+                </div>
+
+                <div class="form-group">
+                    <label for="telNumber">전화번호</label>
+                    <input type="text" id="telNumber" th:field="*{telNumber}" class="form-control" placeholder="새 전화번호">
+                    <p th:if="${#fields.hasErrors('telNumber')}" th:errors="*{telNumber}" class="fieldError">Incorrect date</p>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn2 btn-two purple rounded" style="margin-top:10px; font-weight: bold;">정보 수정</button>
+                </div>
+
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+            </form>
+        </div>
+    </section>
+</div>
+</html>

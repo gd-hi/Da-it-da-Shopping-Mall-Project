@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+</head>
+
+<div th:fragment="header" class="mx-auto d-block sticky-top" style="border-bottom: 1px solid gray">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top" style="font-size: 90%;">
+        <div class="container px-1 px-lg-1">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <a class="navbar-brand a" href="/" style="font-weight: bold;"><img src="/img/daitda-logo.png" style="width: 140px; height: 70px;"></a>
+
+            <body onLoad="initClock()">
+            <div id="timedate">
+                <a id="h">12</a> :
+                <a id="m">00</a> :
+                <a id="s">00</a>
+            </div>
+
+            <div class="collapse navbar-collapse container-fluid" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 menu align-center expanded text-center">
+                    <li class="nav-item dropdown" sec:authorize="hasAnyAuthority('ROLE_ADMIN')">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" style="color:black;" data-bs-toggle="dropdown" aria-expanded="false">
+                            관리자메뉴
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" style="color:black;" href="/admin/item/new">상품 등록</a></li>
+                            <li><a class="dropdown-item" style="color:black;" href="/admin/items">상품 관리</a></li>
+                            <li><a class="dropdown-item" style="color:black;" href="/notice/make">공지사항 등록</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/notice/notice">공지사항</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link active" href="/orders">구매이력</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAnonymous()">
+                        <a class="nav-link active" href="/members/login">로그인</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAnonymous()">
+                        <a class="nav-link active" href="/members/new">회원가입</a>
+                    </li>
+                </ul>
+
+                <ul class="navbar-nav ml-auto mb-2 mb-lg-0 ms-lg-4 ml-auto" >
+                    <li class="nav-item collapse navbar-collapse">
+                        <form class="d-flex" th:action="@{/cart}" sec:authorize="isAuthenticated()">
+                            <button class="btn" type="submit">
+                                <i class="bi-cart-fill"></i>
+                                <span class="badge bg-dark text-white rounded-pill" style="font-size: 14px;" th:text="${cartItemCount}">0</span>
+                            </button>
+                        </form>
+                    </li>
+                    <li class="nav-item dropdown collapse navbar-collapse" sec:authorize="isAuthenticated()">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle" style="font-size: 48px;"></i> <!-- 사용자 아이콘 -->
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <li>
+                                <div th:if="${#authorization.expression('isAuthenticated')}" class="d-flex align-items-center">
+                                    <p class="navbar-text mx-2 fw-bolder" style="font-size:90%;">
+                                    <span th:if="${#authorization.expression('hasAuthority(''ROLE_ADMIN'')')}">
+                                        <span th:utext="${#strings.replace(#authentication.name, '\n', '<br/>') + '<br/>관리자님 환영합니다'}"></span>
+                                    </span>
+                                        <span th:if="${#authorization.expression('hasAuthority(''ROLE_USER'')')}">
+                                        <!--일반 유저-->
+                                        <span th:if="${#strings.contains((#authentication.principal),'org.springframework.security.core.userdetails.User')}">
+                                            <span th:utext="${#strings.abbreviate(#authentication.name, 20)}"></span>
+                                        </span>
+
+                                            <!--구글-->
+                                        <span th:if="${#strings.contains((#authentication.principal),'sub=')}">
+                                            <span th:utext="${#authentication.principal.getAttribute('email')}"></span>
+
+                                        </span>
+
+                                            <!--카카오-->
+                                        <span th:if="${#strings.contains((#authentication.principal),'kakao_account')}">
+                                            <span th:utext="${#strings.substring(#strings.setSplit(#authentication.principal.getAttribute('kakao_account') ,'=')[12], 0, #strings.length(#strings.setSplit(#authentication.principal.getAttribute('kakao_account') ,'=')[12])-1)}"></span>
+                                        </span>
+
+                                            <!--네이버-->
+                                        <span th:if="${#strings.contains((#authentication.principal),'resultcode=')}">
+                                            <span th:utext="${#strings.setSplit ((#strings.setSplit(#authentication.principal.getAttributes,'=')[6]), ',')[0]}"></span>
+                                        </span>
+
+                                        <span><br>유저님 환영합니다</span>
+                                    </span>
+                                    </p>
+                                </div>
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="/members/update">회원정보수정</a></li>
+                            <li><a class="dropdown-item" href="/members/delete">회원탈퇴</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li class="dropdown-item" sec:authorize="isAuthenticated()">
+                                <a class="nav-link active" href="/members/logout" style="font-size: 20px; color: #8A2BE2">
+                                    <i class="bi bi-box-arrow-right"></i><span style="color: #8A2BE2;">&nbsp&nbsp로그아웃</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</div>
+
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+</body>
+</html>

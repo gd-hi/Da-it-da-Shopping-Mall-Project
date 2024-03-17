@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<head>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>오시는 길</title>
+
+    <th:block layout:fragment="script">
+        <script type="text/javascript"
+                src="//dapi.kakao.com/v2/maps/sdk.js?appkey=APIKEY&libraries=services,clusterer,drawing"></script>
+        <link th:href="@{/css/main/map.css}" rel="stylesheet">
+    </th:block>
+
+</head>
+<div layout:fragment="content">
+    <!-- Header-->
+    <header class="StreamsHero-image bg-dark py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="text-center text-white">
+                <h1 class="display-4 fw-bolder">다잇다 오시는 길</h1>
+            </div>
+        </div>
+    </header>
+
+    <section class="py-5">
+        <div class="mapbox-all">
+            <div class="mapbox-map">
+                <div class="mapbox-nav">
+                    <div id="map" ></div>
+                </div >
+                <div class="mapbox-text">
+                    <hr class="border border- border-2 opacity-75">
+                    <table class="text table table-hover" style="float: left;">
+                        <tr>
+                            <th>대중교통</th>
+                            <th>네비게이션</th>
+                        </tr>
+                        <tr>
+                            <td>
+                                <br>
+                                <h6>전철/지하철</h6>
+                                인천 1호선 부평역 5번 출구<br>
+                                서울 1호선 부평역 3번 출구
+                            </td>
+                            <td>
+                                <br>
+                                <h6>스테이션타워 빌딩</h6>
+                                주소: 인천 부평구 경원대로 1366<br>
+                                지번: 부평동 534-48<br>
+                                주차장 입구는 건물 뒤에 있습니다.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <h6>부평역(대한극장) 정류장</h6>
+                                간선: 1, 10, 23, 24-1, 35번 버스<br>
+                                지선: 574번 버스<br>
+                                좌석: 302, 302B번 버스<br>
+                                <h6>부평역(북인천우체국) 정류장</h6>
+                                간선: 1, 2, 10, 23, 24-1, 30, 34, 35, 111-2, 112번 버스<br>
+                                좌석: 111, 111B, 302번 버스<br>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script type="text/javascript"
+            src="//dapi.kakao.com/v2/maps/sdk.js?appkey=9cba91a907d73ed90415d5736ebef4cb&libraries=services"></script>
+    <script>
+        var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+            mapOption = {
+                center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+                level: 3 // 지도의 확대 레벨
+            };
+
+        // 지도를 생성합니다
+        var map = new kakao.maps.Map(mapContainer, mapOption);
+
+        // 주소-좌표 변환 객체를 생성합니다
+        var geocoder = new kakao.maps.services.Geocoder();
+
+        geocoder.addressSearch('인천광역시 부평구 경원대로 1366', function(result, status) {
+
+             if (status === kakao.maps.services.Status.OK) {
+
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+                var marker = new kakao.maps.Marker({
+                    map: map,
+                    position: coords
+                });
+
+                var infowindow = new kakao.maps.InfoWindow({
+                    content: '<div style="width:150px;text-align:center;padding:6px 0;">(주)Da it da</div>'
+                });
+                infowindow.open(map, marker);
+
+                map.setCenter(coords);
+            }
+        });
+    </script>
+</div>
+</html>

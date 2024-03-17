@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+<head>
+    <meta http-equiv="content-Type" content="text/html; charset=UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <script type="text/javascript" th:src="@{/js/notice/notice.js}"></script>
+    <link th:href="@{/css/notice/notice.css}" rel="stylesheet">
+    <title>공지사항</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <header class="StreamsHero-image bg-dark py-5">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="text-center text-white">
+                <h1 class="display-4 fw-bolder">공지사항</h1>
+                <p class="lead fw-normal text-white-50 mb-0">공지사항을 확인하세요</p>
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <section class="py-5 infinite-scroll-section" id="infinite-scroll-section">
+            <div class="container px-4 px-lg-5 my-5">
+                <th:block th:if="${notices.isEmpty()}">
+                    <div class="text-center">
+                        <p>공지사항이 없습니다</p>
+                    </div>
+                </th:block>
+                <div id="notice" th:each="notice, status : ${notices.getContent()}">
+                    <div class="notice_id" th:text="${notice.id}"></div>
+                    <button type="button" class="notice_title" th:text="${notice.title}"
+                            onclick="collapse(this);"></button>
+                    <div class="notice_content">
+                        <p class="content2" th:text="${notice.content}"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+</body>
+</html>

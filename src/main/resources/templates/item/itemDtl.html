@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/layout1}">
+
+<head>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+
+    <title>상품 상세 정보</title>
+
+    <script type="text/javascript" th:src="@{/js/item/itemDtl.js}"></script>
+    <link th:href="@{/css/item/itemDtl.css}" rel="stylesheet">
+</head>
+
+<th:block layout:fragment="script">
+    <script th:inline="javascript">
+        function requestPay() {
+            var IMP = window.IMP; // 초기화
+            IMP.init("imp03235045"); // 가맹점 식별코드
+
+            var count = $("#count").val();
+            var price = $("#price").val();
+            var totalPrice = price * count;
+
+            IMP.request_pay({
+                pg: "kakaopay",
+                pay_method: "card",
+                merchant_uid: 'merchant_' + new Date().getTime(),
+                name: [[${ item.itemNm }]],
+                amount: totalPrice,
+                buyer_email: "iamport@siot.do",
+                buyer_name: "김철수",
+                buyer_tel: "010-1234-5678",
+            }, function (rsp) {
+                if (rsp.success) {
+                    // 결제 성공 시 로직,
+                    var imp_uid = rsp.imp_uid; // 결제 고유 번호
+                    var paramData = {
+                        itemId: $("#itemId").val(),
+                        count: $("#count").val(),
+                        totalPrice: totalPrice,
+                        makeMerchantUid: "merchant_" + new Date().getTime(), // 예시, 실제로는 서버에서 생성할 수도 있음
+                        impUid: imp_uid // 결제 성공 시 받은 imp_uid 추가
+                    };
+
+                    // CSRF 토큰 값 설정 예시
+                    var header = $("meta[name='_csrf_header']").attr("content");
+                    var token = $("meta[name='_csrf']").attr("content");
+
+                    // 서버로 imp_uid와 함께 주문 데이터 전송
+                    $.ajax({
+                        url: "/order", // URL 수정
+                        type: "POST",
+                        contentType: "application/json",
+                        data: JSON.stringify(paramData),
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader(header, token);
+                        },
+                        dataType: "json",
+                        cache: false,
+                        success: function (result, status) {
+                            Swal.fire({
+                                title: "주문이 완료 되었습니다.",
+                                icon: 'success',
+                            })
+                            .then((result) => {
+                                if (result.isConfirmed) {
+                                    location.href = '/'
+                                }
+                            })
+                        },
+                        error: function (jqXHR, status, error) {
+                            if(jqXHR.status == '401'){
+                                Swal.fire({
+                                    title: '로그인이 필요합니다.',
+                                    text: '로그인 후 이용해주세요.',
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#3085d6',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: '로그인 할게요.',
+                                    cancelButtonText: '그냥 볼게요.'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        location.href = '/members/login';
+                                    }
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: jqXHR.responseText,
+                                    icon: 'warning',
+                                });
+                            }
+                        }
+                    });
+                }
+            }
+        )
+    };
+    </script>
+</th:block>
+
+<!-- 사용자 CSS 추가 -->
+<th:block layout:fragment="css">
+    <style>
+
+    </style>
+</th:block>
+
+<div layout:fragment="content" style="margin-left:25%; margin-right:25%">
+    <input type="hidden" id="itemId" th:value="${item.id}">
+    <section class="py-5" style="padding: 80px 0;">
+        <div class="container px-4 px-lg-5 my-5">
+            <div class="row gx-4 gx-lg-5 align-items-center">
+                <div class="col-md-6">
+                    <div class="wd50">
+                        <span th:if="${item.itemSellStatus == T(com.shop.constant.ItemSellStatus).SELL}"
+                              class="badge mgb-15" style="background-color: #8A2BE2;">판매중</span>
+                        <span th:unless="${item.itemSellStatus == T(com.shop.constant.ItemSellStatus).SELL}"
+                              class="badge mgb-15" style="background-color: #8A2BE2;">품절</span>
+                        <img class="card-img-top mb-5 mb-md-0 rounded repImg" th:src="${item.itemImgDtoList[0].imgUrl}"
+                             th:alt="${item.itemNm}" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <h3 class="display-6 fw-bolder removeCategory"
+                        th:text="${#strings.abbreviate(item.itemNm.split('#')[0], 100)}" style="color: black;"></h3>
+                    <div class="fs-5 mb-5">
+                        <input type="hidden" th:value="${item.price}" id="price" name="price">
+                        <hr class="my-4">
+                        <span th:text="${#numbers.formatInteger(item.price, 0, 'COMMA')}"></span>원
+                    </div>
+                    <div style="background-color: #8A2BE20D;">
+                        <p class="lead p-3" style="color:black;" th:text="${item.itemDetail}"></p>
+                    </div>
+                    <br>
+                    <br>
+                    <div class="d-flex">
+                        <div th:if="${item.itemSellStatus == T(com.shop.constant.ItemSellStatus).SELL}" class="text-right">
+                            <input class="form-control text-center me-3" id="count" type="number" value="1"  min="1" name="count" style="max-width: 4.5rem" />
+                            <button class="btn btn-outline-dark flex-shrink-0" type="button" onclick="addCart()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                                     class="bi bi-cart-fill" viewBox="0 0 16 16">
+                                    <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+                                </svg>장바구니</button>
+                            <button type="button" class="btn btn-outline-dark flex-shrink-0" onclick="requestPay()" sec:authorize="isAuthenticated()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-credit-card-2-back-fill" viewBox="0 0 16 16">
+                                    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v5H0zm11.5 1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM0 11v1a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1z"/>
+                                </svg>바로주문</button>
+                            <div class="text-right mgt-50">
+                                <hr class="my-4">
+                                <h4>총 결제 금액</h4>
+                                <br>
+                                <h4 name="totalPrice" id="totalPrice" class="font-weight-bold"></h4>
+                            </div>
+                        </div>
+                        <div th:unless="${item.itemSellStatus == T(com.shop.constant.ItemSellStatus).SELL}" class="text-right">
+                            <button type="button" class="btn btn-lg" style="background-color: #8A2BE2; color: white;">품절</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+            <!-- 리스트로 변경된 네비게이션 링크 -->
+            <ul class="navigation-list">
+                <li><a href="javascript:void(0);" onclick="scrollToSection('detailInfo')">상품 상세정보</a></li>
+                <li><a href="javascript:void(0);" onclick="scrollToSection('review')">리뷰</a></li>
+                <li><a href="javascript:void(0);" onclick="scrollToSection('inquiry')">문의</a></li>
+                <li><a href="javascript:void(0);" onclick="scrollToSection('deliveryRefund')">배송/환불</a></li>
+            </ul>
+            <hr>
+
+            <!-- 내용 추가 -->
+            <div id="detailInfo">
+                <h2>상품 상세정보</h2>
+                <!-- 상품 상세정보 내용 -->
+            </div>
+
+            <div id="review">
+                <h2>리뷰</h2>
+                <!-- 리뷰 내용 -->
+            </div>
+
+            <div id="inquiry">
+                <h2>문의</h2>
+                <!-- 문의 내용 -->
+            </div>
+
+            <div id="deliveryRefund">
+                <h2>배송/환불</h2>
+                <!-- 배송/환불 내용 -->
+            </div>
+        </div>
+    </section>
+</div>
+</html>

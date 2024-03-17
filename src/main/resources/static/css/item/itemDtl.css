@@ -1,0 +1,33 @@
+.navigation-list {
+    list-style: none; /* 기본 리스트 스타일 제거 */
+    text-align: center; /* 가운데 정렬 */
+    padding: 0; /* 기본 패딩 제거 */
+    margin-bottom: 40px; /* 하단 여백 */
+}
+.navigation-list li {
+    display: inline-block; /* 인라인 블록 요소로 표시 */
+    margin: 0 10px; /* 좌우 여백 */
+}
+.navigation-list a {
+    text-decoration: none; /* 밑줄 제거 */
+    color: #8A2BE2; /* 기본 글자색 */
+    padding: 10px 20px; /* 패딩 */
+    transition: color 0.3s; /* 색상 변경 애니메이션 */
+    border-radius: 5px; /* 둥근 모서리 */
+    font-size: 1rem; /* 글자 크기 */
+}
+.navigation-list a:hover, .navigation-list a:focus {
+    color: #7A15E2; /* 호버 및 포커스 시 글자색 변경 */
+    background-color: #f0f0f0; /* 호버 및 포커스 시 배경색 변경 */
+}
+
+
+.rounded{
+        display: inline-block;
+}
+#count{
+    display: inline-block;
+}
+alert{
+    background-color: black;
+}

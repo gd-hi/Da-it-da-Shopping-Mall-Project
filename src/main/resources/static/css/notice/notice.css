@@ -1,0 +1,56 @@
+.notice_title {
+    background-color: #777;
+    color: white;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+    border: 0.5px solid black;
+    display: block; /* Add this line */
+    text-overflow: ellipsis; /* Add this line */
+    white-space: nowrap; /* Add this line */
+    overflow: hidden; /* Add this line */
+}
+
+.ac,
+.notice_title:hover {
+    background-color: #555;
+}
+
+.notice_content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out;
+    background-color: #f1f1f1;
+}
+
+.notice_title:after {
+    content: '\002B';
+    color: white;
+    font-weight: bold;
+    float: right;
+    margin-left: 5px;
+}
+
+.ac:after {
+    notice_content: "\2212";
+}
+
+.notice_id {
+    display: none;
+}
+
+.content2 {
+    line-height: 160%;
+    margin-left: 30px;
+    margin-right: 30px;
+    margin-top: 10px;
+}
+
+.infinite-scroll-section {
+    /* Added a new class for the section */
+    padding-top: 20px; /* Adjust this value as needed */
+}
