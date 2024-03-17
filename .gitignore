@@ -13,6 +13,7 @@ target/
 .springBeans
 .sts4-cache
 .properties
+application-oauth.properties
 
 ### IntelliJ IDEA ###
 .idea
