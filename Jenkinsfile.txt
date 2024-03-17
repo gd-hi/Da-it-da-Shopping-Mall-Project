@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // 환경 변수 설정
-        EC2_IP = '52.78.29.160' // EC2 인스턴스 IP 주소를 Jenkins 설정에서 환경 변수로 설정
+        EC2_IP = '' // EC2 인스턴스 IP 주소를 Jenkins 설정에서 환경 변수로 설정
         DOCKER_CREDENTIALS_ID = 'DaitdaJenkinscredentialsidDOCKER' // Docker Hub Credentials ID를 Jenkins 설정에서 환경 변수로 설정
         SSH_CREDENTIALS_ID = 'DaitdaPrivateKeyId' // SSH Private Key의 Credentials ID를 Jenkins 설정에서 환경 변수로 설정
     }
