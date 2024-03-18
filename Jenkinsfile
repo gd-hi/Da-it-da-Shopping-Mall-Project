@@ -1,6 +1,11 @@
 pipeline {
     agent any
     
+    tools {
+        // Maven 설치 이름을 정의합니다.
+        maven 'Maven_3_8_4'
+    }
+    
     stages {
         stage('Checkout') {
             steps {
@@ -10,9 +15,9 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    // Maven 설치 이름을 사용하여 Maven 명령 실행
-                    def mvnHome = tool name: 'Maven_3_8_4', type: 'maven'
-                    sh "${mvnHome}/bin/mvn clean package"
+                    // Maven 설치 이름을 사용하지 않고 직접 Maven 명령 실행
+                    // Jenkins가 Maven을 올바르게 설치하고 PATH에 추가했다면, 이 명령어는 작동해야 합니다.
+                    sh "mvn clean package"
                 }
             }
         }
