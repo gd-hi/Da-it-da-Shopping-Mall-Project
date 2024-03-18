@@ -4,3 +4,7 @@ FROM openjdk:17-jdk-alpine
 COPY target/*.jar app.jar
 # 컨테이너 실행 시 .jar 파일 실행
 ENTRYPOINT ["java","-jar","/app.jar"]
+FROM jenkins/jenkins:lts
+USER root
+RUN apt-get update && apt-get install -y maven
+USER jenkins
