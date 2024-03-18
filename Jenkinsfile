@@ -10,10 +10,9 @@ pipeline {
         stage('Build') {
             steps {
                 script {
-                    // Maven Docker 이미지를 사용하여 Maven 빌드 실행
-                    docker.image('maven:3.6.3-jdk-11').inside {
-                        sh 'mvn clean package'
-                    }
+                    // Maven 설치 이름을 사용하여 Maven 명령 실행
+                    def mvnHome = tool name: 'Maven_3_8_4', type: 'maven'
+                    sh "${mvnHome}/bin/mvn clean package"
                 }
             }
         }
