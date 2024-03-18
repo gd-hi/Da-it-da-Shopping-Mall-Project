@@ -26,7 +26,7 @@ pipeline {
                 script {
                     // 현재 디렉토리에 있는 Dockerfile을 사용하여 Docker 이미지 빌드
                     // "DatidaJenkinsDockerapp:${BUILD_NUMBER}"는 이미지 태그입니다.
-                    docker.build("datidajenkinsdockerapp:${BUILD_NUMBER}")
+                    docker.build("gdhi/datidajenkinsdockerapp:${BUILD_NUMBER}")
                 }
             }
         }
@@ -36,7 +36,7 @@ pipeline {
                     // Docker Hub에 이미지 푸시
                     // "${DOCKER_CREDENTIALS_ID}"는 Jenkins에 설정된 Docker Hub의 credentials ID입니다.
                     docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_CREDENTIALS_ID}") {
-                        docker.image("datidajenkinsdockerapp:${BUILD_NUMBER}").push()
+                        docker.image("gdhi/datidajenkinsdockerapp:${BUILD_NUMBER}").push()
                     }
                 }
             }
