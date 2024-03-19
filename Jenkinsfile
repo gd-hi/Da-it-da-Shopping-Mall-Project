@@ -7,34 +7,35 @@ pipeline {
     }
     
     stages {
+        // 소스 코드를 SCM(Git 등)에서 체크아웃
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
+        // Maven을 사용하여 Java 애플리케이션을 빌드하고 패키징
         stage('Build') {
             steps {
                 script {
-                    // Maven 설치 이름을 사용하지 않고 직접 Maven 명령 실행
-                    // Jenkins가 Maven을 올바르게 설치하고 PATH에 추가했다면, 이 명령어는 작동해야 합니다.
+                    // .jar 파일 생성
                     sh "mvn clean package"
                 }
             }
         }
+        // Dockerfile을 사용하여 Docker 이미지를 빌드
         stage('Build Docker Image') {
             steps {
                 script {
-                    // 현재 디렉토리에 있는 Dockerfile을 사용하여 Docker 이미지 빌드
-                    // "DatidaJenkinsDockerapp:${BUILD_NUMBER}"는 이미지 태그입니다.
+                    // 이미지 태그는 Jenkins 빌드 번호를 사용
                     docker.build("gdhi/datidajenkinsdockerapp:${BUILD_NUMBER}")
                 }
             }
         }
+        // 생성된 Docker 이미지를 Docker Hub에 푸시
         stage('Push Docker Image') {
             steps {
                 script {
-                    // Docker Hub에 이미지 푸시
-                    // "${DOCKER_CREDENTIALS_ID}"는 Jenkins에 설정된 Docker Hub의 credentials ID입니다.
+                    //  Jenkins의 credentials를 사용하여 Docker Hub 인증을 수행
                     docker.withRegistry('https://index.docker.io/v1/', "${DOCKER_CREDENTIALS_ID}") {
                         docker.image("gdhi/datidajenkinsdockerapp:${BUILD_NUMBER}").push()
                     }
@@ -44,9 +45,8 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // SSH를 사용하여 EC2 인스턴스에서 Docker 컨테이너 실행
-                    // "${SSH_CREDENTIALS_ID}"는 Jenkins에 설정된 SSH 접속 정보의 credentials ID입니다.
-                    // "${EC2_IP}"는 대상 EC2 인스턴스의 IP 주소입니다.
+                    // SSH를 사용하여 EC2 인스턴스에 접속한 후, 새로 푸시된 Docker 이미지를 바탕으로 Docker 컨테이너를 실행
+                    // 보안을 위해 Jenkins의 관리 메뉴에서 설정하고, 파이프라인에서는 ID를 참조하여 사용
                     sshagent(["${SSH_CREDENTIALS_ID}"]) {
                         sh "ssh -o StrictHostKeyChecking=no ec2-user@${SERVER_IP} 'docker run -d -p 80:8080 gdhi/datidajenkinsdockerapp:${BUILD_NUMBER}'"
                     }
