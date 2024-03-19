@@ -8,6 +8,17 @@
     <title>상품 등록</title>
     <script type="text/javascript" th:src="@{/js/item/itemForm.js}"></script>
     <link th:href="@{/css/item/itemForm.css}" rel="stylesheet">
+    <script>
+        $(document).ready(function(){
+            var errorMessage = "[[${errorMessage}]]";
+            if (errorMessage !== "null" && errorMessage.length > 0) {
+                Swal.fire({
+                    title: errorMessage,
+                    icon: 'warning',
+                });
+            }
+        });
+    </script>
 </head>
 <div layout:fragment="content">
     <header class="StreamsHero-image bg-dark py-5">

@@ -7,17 +7,6 @@ document.addEventListener("DOMContentLoaded", function() {
     }
 });
 
-$(document).ready(function(){
-    var errorMessage = [[${errorMessage}]];
-    if(errorMessage != null){
-        Swal.fire({
-             title: errorMessage,
-             icon: 'warning',
-        });
-    }
-    bindDomEvent();
-});
-
 function bindDomEvent(){
     $(".imageFile.form-control").on("change", function(){
         var fileName = $(this).val().split("\\").pop();
