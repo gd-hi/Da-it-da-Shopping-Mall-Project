@@ -24,31 +24,40 @@ public class ItemImgService {
     private final FileService fileService;
 
     public void saveItemImg(ItemImg itemImg, MultipartFile itemImgFile) throws Exception {
-        String oriImgName = itemImgFile.getOriginalFilename();
-        String imgName = "";
-        String imgUrl = "";
-        System.out.println(oriImgName);
+        try {
+            String oriImgName = itemImgFile.getOriginalFilename();
+            String imgName = "";
+            String imgUrl = "";
+            System.out.println(oriImgName);
 
-        // 파일 업로드
-        if (!StringUtils.isEmpty(oriImgName)){
-            System.out.println("******");
-            imgName = fileService.uploadFile(itemImgLocation, oriImgName,
-                    itemImgFile.getBytes());
+            // 파일 업로드
+            if (!StringUtils.isEmpty(oriImgName)) {
+                System.out.println("******");
+                imgName = fileService.uploadFile(itemImgLocation, oriImgName,
+                        itemImgFile.getBytes());
 
-            System.out.println(imgName);
+                System.out.println(imgName);
+                System.out.println("******");
 
-            imgUrl = "/images/item/" + imgName;
+                imgUrl = "/images/item/" + imgName;
+                System.out.println("******");
+            }
+
+            System.out.println("1111");
+            itemImg.updateItemImg(oriImgName, imgName, imgUrl);
+            System.out.println("(((((");
+
+            itemImgRepository.save(itemImg);
+        } catch (Exception e) {
+            // 예외를 콘솔에 출력
+            e.printStackTrace();
+            // 필요한 경우, 로그 파일에 예외를 기록
+            // log.error("Item image saving failed", e);
+            // 예외를 다시 throw 하여 상위로 전파할 수도 있음
+            // throw e;
         }
-
-        System.out.println("1111");
-
-        itemImg.updateItemImg(oriImgName, imgName, imgUrl);
-
-        System.out.println("(((((");
-
-        itemImgRepository.save(itemImg);
-
     }
+
 
     public void updateItemImg(Long itemImgId, MultipartFile itemImgFile) throws Exception {
         if (!itemImgFile.isEmpty()){
